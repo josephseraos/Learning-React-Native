@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
-import { StatusBar, StyleSheet, View, Text, TextInput, Button } from 'react-native'
+import { StatusBar, StyleSheet, View, Text, TextInput, Button, Alert, BackHandler } from 'react-native'
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: StatusBar.currentHeight,
         flex: 1
     },
 
     authenticationFields: {
         // flex: 1,
+        paddingTop: StatusBar.currentHeight,
         flexDirection: "row",
     },
 
@@ -48,18 +48,22 @@ const SignIn = props => {
     const [password, setPassword] = useState("")
 
     const usernameField = <TextInput style={styles.fieldTextInput} autoCapitalize="none"
+        selectTextOnFocus
         autoFocus
         value={username}
         onChangeText={text => {
             setUsername(text)
         }}
+        ref={input => { this.usernameField = input}}
     />
 
     const passwordField = <TextInput style={styles.fieldTextInput} secureTextEntry
+        selectTextOnFocus
         value={password}
         onChangeText={text => {
             setPassword(text)
         }}
+        ref={input => { this.passwordField = input }}
     />
 
     return (
@@ -75,14 +79,39 @@ const SignIn = props => {
                 </View>
             </View>
             <View style={styles.authenticationButtons}>
-                <Button title="Entrar" color="steelblue" />
+                <Button title="Entrar" color="steelblue" onPress={() => {
+                    if (username === 'admin' && password === '123456') {
+                        setPassword("")
+                        props.signin(username)
+                    } else {
+                        Alert.alert(
+                            'Falha na autenticação',
+                            'Nome de usuário e/ou senha incorreto(s)', [
+                                {text: 'Ok', onPress: () => {
+                                    setPassword("")
+                                    this.usernameField.focus()
+                                }}
+                            ]
+                        )
+                    }
+                }} />
             </View>
             <View style={[styles.authenticationButtons, {paddingTop: 5}]}>
                 <Button title="Sair" color="darkred"
                     onPress={() => {
-                        setUsername("")
-                        setPassword("")
-                        // usernameField.focus()
+
+                        Alert.alert(
+                            'Saindo',
+                            'Deseja realmente sair?',
+                            [
+                                {text: 'Sim', onPress: () => { BackHandler.exitApp() }},
+                                {text: 'Cancelar', onPress: () => {
+                                    setUsername("")
+                                    setPassword("")
+                                    this.usernameField.focus()
+                                }, style: 'cancel'}
+                            ]
+                        )
                     }}
                 />
             </View>

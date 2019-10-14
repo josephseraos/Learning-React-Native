@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { StatusBar, ScrollView, StyleSheet, View, Text } from 'react-native'
+import { Alert, StatusBar, ScrollView, StyleSheet, View, Text, Button } from 'react-native'
 
 import SignIn from './auth/SignIn'
 
@@ -27,12 +27,24 @@ const Header = () => {
     )
 }
 
-const Main = () => {
+const Main = props => {
     return (
         <View>
             <Header />
             <View>
                 <Text>Main</Text>
+                <Button title="Sair" onPress={() => {
+                    Alert.alert(
+                        'Saindo',
+                        'Deseja realmente sair?',
+                        [
+                            {text: 'Sim', onPress: () => { props.sair() }},
+                            {text: 'Cancelar', onPress: () => {
+                                
+                            }, style: 'cancel'}
+                        ]
+                    )
+                }} />
             </View>
         </View>
     )
@@ -44,10 +56,18 @@ const Main = () => {
 const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
 
+    const signin = (username) => {
+        setIsAuthenticated(true)
+    }
+
+    const sair = () => {
+        setIsAuthenticated(false)
+    }
+
     return (
         isAuthenticated
-            ? <Main />
-            : <SignIn />
+            ? <Main sair={sair} />
+            : <SignIn signin={signin}/>
     )
 }
 
